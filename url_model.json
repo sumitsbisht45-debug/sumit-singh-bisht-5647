@@ -1,0 +1,101 @@
+{
+  "report": {
+    "legitimate": {
+      "precision": 0.9534833483348335,
+      "recall": 0.981942899517983,
+      "f1-score": 0.9675038816330258,
+      "support": 26970.0
+    },
+    "phishing": {
+      "precision": 0.9748761865456046,
+      "recall": 0.9360047550646392,
+      "f1-score": 0.9550451065120158,
+      "support": 20189.0
+    },
+    "accuracy": 0.9622765537861278,
+    "macro avg": {
+      "precision": 0.964179767440219,
+      "recall": 0.9589738272913111,
+      "f1-score": 0.9612744940725209,
+      "support": 47159.0
+    },
+    "weighted avg": {
+      "precision": 0.9626417276608847,
+      "recall": 0.9622765537861278,
+      "f1-score": 0.9621702186860152,
+      "support": 47159.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      26483,
+      487
+    ],
+    [
+      1292,
+      18897
+    ]
+  ],
+  "feature_importances": [
+    [
+      "is_https",
+      0.4321
+    ],
+    [
+      "length",
+      0.2455
+    ],
+    [
+      "n_digits",
+      0.1418
+    ],
+    [
+      "n_hyphens",
+      0.0529
+    ],
+    [
+      "n_subdomains",
+      0.0464
+    ],
+    [
+      "n_dots",
+      0.0455
+    ],
+    [
+      "suspicious_tld",
+      0.0217
+    ],
+    [
+      "n_keywords",
+      0.0122
+    ],
+    [
+      "n_encoded",
+      0.0011
+    ],
+    [
+      "is_shortener",
+      0.0007
+    ],
+    [
+      "is_ip",
+      0.0002
+    ],
+    [
+      "has_punycode",
+      0.0
+    ],
+    [
+      "has_at",
+      0.0
+    ],
+    [
+      "has_port",
+      0.0
+    ],
+    [
+      "has_exe",
+      0.0
+    ]
+  ]
+}
