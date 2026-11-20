@@ -1,44 +1,38 @@
-# ScamShield AI
+# ScamShield AI — ML engine (offline research track)
 
-Explainable scam and phishing checks for links, messages, job offers and screenshots. Each scan returns a
-0–100 risk score, a risk level, the warning signs found, a plain-language explanation and next steps.
+This folder contains **offline** Python training scripts for the classical ML models described in the
+project brief (TF‑IDF + Logistic Regression for messages, Random Forest for URLs).
 
-> ScamShield AI gives a risk estimate, not a guarantee. A low score does not mean something is safe.
+> **Status: trained and evaluated offline, not deployed.** The live app runs an explainable rule engine
+> (`src/lib/detection/`) plus an AI second opinion. Results from the latest training run, with caveats, are
+> in [`docs/ML_EVALUATION.md`](../docs/ML_EVALUATION.md); raw output is in `reports/`.
 
-## Features
+## Datasets (download yourself — not redistributed here)
 
-- **URL scanner** — structural analysis only (the link is never opened or fetched).
-- **Message scanner** — SMS, email and WhatsApp text: urgency, credential requests, payment pressure, impersonation, embedded links.
-- **Job offer scanner** — upfront fees, unrealistic pay, off-platform contact, missing company details.
-- **Screenshot scanner** — reads the text in an image with AI vision, then runs the message/job rules.
-- **AI second opinion** on every scan (bounded ±15 points); falls back to rules only when unavailable, and the report says so.
-- **Dashboard** and **scan history** with type/risk filters, report detail and delete.
-- Private per-user data (row-level security), rate limits (30 scans / 10 screenshots per 10 minutes).
+| Model | Dataset | Licence |
+| --- | --- | --- |
+| Message classifier | [UCI SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) | CC BY 4.0 |
+| URL classifier | [UCI PhiUSIIL Phishing URL Dataset](https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset) | CC BY 4.0 |
 
-## Tech stack
+Place the files at `ml_engine/data/SMSSpamCollection` and `ml_engine/data/PhiUSIIL_Phishing_URL_Dataset.csv`.
 
-| Layer | Choice |
-| --- | --- |
-| App | TanStack Start v1 (React 19, Vite 7), Tailwind CSS v4, shadcn/ui |
-| Server logic | TanStack `createServerFn` (runs on Cloudflare Workers) |
-| Auth + database | Lovable Cloud (Postgres + auth: email/password, Google, Lovable) |
-| AI | Lovable AI Gateway (`@lovable.dev/ai-gateway`) |
-| Offline ML | Python / scikit-learn in `ml_engine/` (not served) |
+Note: SMS spam ≠ scam. The SMS dataset labels marketing spam too, so treat that model as a baseline only.
 
-## Local development
+## Run
 
-```sh
-bun install
-cp .env.example .env   # fill in your backend URL and publishable key
-bun run dev            # http://localhost:8080
-bun run test           # detection rule tests (vitest)
+```bash
+cd ml_engine
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python train_message_model.py   # prints precision / recall / F1 + confusion matrix
+python train_url_model.py
 ```
 
-## Documentation
+Each script writes `models/*.joblib` and `reports/*.json` with the real evaluation results.
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Server API](docs/API.md)
-- [ML evaluation](docs/ML_EVALUATION.md)
-- [Deployment](docs/DEPLOYMENT.md)
-- [Offline ML engine](ml_engine/README.md)
+## Serving (future work)
+
+To use a trained model in production, host it behind a small HTTP API (e.g. FastAPI on Render) and call it
+from the app's server functions. The URL feature extractor in `features.py` mirrors the checks in
+`src/lib/detection/url.ts` so both engines stay explainable.
 
