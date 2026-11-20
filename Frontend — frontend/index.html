@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScamShield AI</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 35px;
+      background: #0b1220;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 750px;
+      margin: 50px auto;
+      background: #172338;
+      padding: 30px;
+      border-radius: 15px;
+    }
+    h1 { color: #42dfb1; }
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      box-sizing: border-box;
+      background: #0b1220;
+      color: white;
+      border: 1px solid #40516a;
+      border-radius: 8px;
+    }
+    select, button {
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 7px;
+      border: none;
+    }
+    button {
+      background: #42dfb1;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #result {
+      margin-top: 25px;
+      padding: 15px;
+      background: #0b1220;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡 ScamShield AI</h1>
+    <p>AI-powered scam and phishing detection platform.</p>
+
+    <h3>Scan suspicious content</h3>
+
+    <select id="type">
+      <option value="url">URL Scanner</option>
+      <option value="message">Message Scanner</option>
+      <option value="job">Fake Job Detector</option>
+    </select>
+
+    <br><br>
+
+    <textarea id="input"
+      placeholder="Paste suspicious URL, message or job offer..."></textarea>
+
+    <br>
+
+    <button onclick="scan()">Scan Now</button>
+
+    <div id="result">Your scan results will appear here.</div>
+  </div>
+
+  <script>
+    async function scan() {
+      const text = document.getElementById("input").value;
+      const type = document.getElementById("type").value;
+      const result = document.getElementById("result");
+
+      if (!text.trim()) {
+        result.innerText = "Please enter content to scan.";
+        return;
+      }
+
+      result.innerText = "Analysing...";
+
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/scan/" + type,
+          {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({text: text})
+          }
+        );
+
+        if (!response.ok) throw new Error("Backend error");
+
+        const data = await response.json();
+
+        result.innerHTML = `
+          <h3>${data.verdict}</h3>
+          <p>Risk Score: ${data.risk_score}/100</p>
+          <p>Risk Level: ${data.risk_level}</p>
+          <p>${data.reasons.join("<br>")}</p>
+        `;
+      } catch (error) {
+        result.innerText =
+          "Unable to connect. Please start the backend server.";
+      }
+    }
+  </script>
+</body>
+</html>
